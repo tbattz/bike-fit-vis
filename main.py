@@ -23,7 +23,8 @@ if __name__ == '__main__':
     with open('bike.json') as f:
         bc = json.load(f)
         print('Read bike configuration file:')
-        print(bc)
+        for key, val in bc.items():
+            print(key+":", val)
 
 
     fig = plt.figure()
