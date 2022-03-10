@@ -4,33 +4,36 @@ import math
 import json
 
 from bike import Bike
+from rider import Rider
 
 
 
 if __name__ == '__main__':
-    # Measurements in mm
-    seatPersonOffsetX = 25.0
-    seatPersonOffsetY = 110.0
-    hip2ShoulderLength = 430.0
-    hip2KneeLength = 440.0
-    knee2FootLength = 410.0
-    footLength = 210.0
-    footContactProportion = 0.75
-    shoulder2ElbowLength = 290.0
-    elbow2WristContactLength = 230.0
-    wrist2FingerHoldPoint = 135.0
-
-
     # Read bike configuration
     with open('bike.json') as f:
         bc = json.load(f)
         print('Read bike configuration file:')
         for key, val in bc.items():
             print(key+":", val)
+        print()
+
+    # Read rider configurations
+    with open('rider.json') as f:
+        rcs = json.load(f)
+        print('Read rider configuration file:')
+        for riderName, rc in rcs.items():
+            print("Rider: %s" % riderName)
+            for key, val in rc.items():
+                print(key+":", val)
+            print()
+
 
     # Create bike
     bike = Bike(bc)
     bike.calcBikePositions()
+
+    # Create rider 1
+    rider1 = Rider(rcs['rider1'], bike, seatColor='royalblue', riderColor='blueviolet', riderAlpha=-0.5)
 
 
     fig = plt.figure()
@@ -40,9 +43,9 @@ if __name__ == '__main__':
     bike.calcCrankAndPedalLoc(theta=-30)
     bike.drawCrankAndPedals()
 
+    rider1.drawSeat()
 
 
     plt.axis('equal')
     plt.show()
-
 

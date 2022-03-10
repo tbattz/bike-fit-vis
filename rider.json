@@ -1,0 +1,13 @@
+{"rider1":{"seatHeight":205.0,
+    "seatLengthFwd":125.0,
+    "seatLengthAft":150.0,
+    "seatPersonOffsetX":25.0,
+    "seatPersonOffsetY":110.0,
+    "hip2ShoulderLength":430.0,
+    "hip2KneeLength":440.0,
+    "knee2FootLength":410.0,
+    "footLength":210.0,
+    "footContactProportion":0.75,
+    "shoulder2ElbowLength":290.0,
+    "elbow2WristContactLength":230.0,
+    "wrist2FingerHoldPoint":135.0}}

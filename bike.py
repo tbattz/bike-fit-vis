@@ -2,12 +2,17 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 class Bike:
+    """
+    Contains methods for calculating positions of the bike frame, wheels, crank and pedals.
+    """
     def __init__(self, bc):
         """
         :param bc: The bike configuration dictionary.
         """
         self.bc = bc
+        self.color = 'gray'
 
         self.rearWheelLoc = None
         self.xrw = None
@@ -85,7 +90,7 @@ class Bike:
         """
         Draw the chain stay line.
         """
-        plt.plot([0, self.rearWheelLoc[0]], [0, self.rearWheelLoc[1]], 'k')
+        plt.plot([0, self.rearWheelLoc[0]], [0, self.rearWheelLoc[1]], c=self.color)
 
     def calcRearWheelLoc(self):
         """
@@ -132,14 +137,14 @@ class Bike:
         """
         Draw the seat tube line.
         """
-        plt.plot([0, self.xst], [0, self.yst], 'k')
+        plt.plot([0, self.xst], [0, self.yst], c=self.color)
 
     def drawSeatStay(self):
         """
         Draw the seat stay.
         """
         # Plot Seat Stay
-        plt.plot([self.rearWheelLoc[0], self.xst], [self.rearWheelLoc[1], self.yst], 'k')
+        plt.plot([self.rearWheelLoc[0], self.xst], [self.rearWheelLoc[1], self.yst], c=self.color)
 
     def calcTopForkLoc(self):
         """
@@ -162,14 +167,14 @@ class Bike:
         """
         Draw the down tube.
         """
-        plt.plot([0, self.xfork], [0, self.yfork], 'k')
+        plt.plot([0, self.xfork], [0, self.yfork], c=self.color)
 
     def drawFrontFork(self):
         """
         Draw the front fork.
         """
         # Plot front fork
-        plt.plot([self.frontWheelLoc[0], self.xfork], [self.frontWheelLoc[1], self.yfork], 'k')
+        plt.plot([self.frontWheelLoc[0], self.xfork], [self.frontWheelLoc[1], self.yfork], c=self.color)
 
     def calcFrontBarLoc(self):
         """
@@ -193,14 +198,14 @@ class Bike:
         """
         Draw the front bar line.
         """
-        plt.plot([self.xst, self.xfb], [self.yst, self.yfb], 'k')
+        plt.plot([self.xst, self.xfb], [self.yst, self.yfb], c=self.color)
 
     def drawHeadTube(self):
         """
         Draw the head tube.
         """
         # Plot head tube
-        plt.plot([self.xfb, self.xfork], [self.yfb, self.yfork], 'k')
+        plt.plot([self.xfb, self.xfork], [self.yfb, self.yfork], c=self.color)
 
     def calcHandleBarLoc(self):
         """
@@ -223,8 +228,8 @@ class Bike:
         """
         Draw the handle bar.
         """
-        plt.plot([self.xfb, self.handleBarPostPosX], [self.yfb, self.handleBarPostPosY], 'k')
-        plt.plot([self.handleBarPostPosX, self.handsPosX], [self.handleBarPostPosY, self.handsPosY], 'k')
+        plt.plot([self.xfb, self.handleBarPostPosX], [self.yfb, self.handleBarPostPosY], c=self.color)
+        plt.plot([self.handleBarPostPosX, self.handsPosX], [self.handleBarPostPosY, self.handsPosY], c=self.color)
 
     def calcCrankAndPedalLoc(self, theta):
         """
@@ -247,17 +252,3 @@ class Bike:
         plt.plot([self.c2x - (self.bc['pedalLength']/2.0), self.c2x + (self.bc['pedalLength']/2.0)], [self.c2y, self.c2y], 'm')
 
 
-    '''def calcSeatExtensionPos(self):
-        
-        # Plot seat extension
-        seatExtX = bc['seatHeight'] * math.cos(seatTube2HoriAngle)
-        seatExtY = bc['seatHeight'] * math.sin(seatTube2HoriAngle)
-        seatPosX = xst - seatExtX
-        seatPosY = yst + seatExtY
-        plt.plot([xst, seatPosX], [yst, seatPosY])
-
-
-    # Plot Seat (Assumes flat seat)
-    plt.plot([seatPosX - bc['seatLengthAft'], seatPosX + bc['seatLengthFwd']], [seatPosY, seatPosY])
-
-    '''
