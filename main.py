@@ -32,8 +32,9 @@ if __name__ == '__main__':
     bike = Bike(bc)
     bike.calcBikePositions()
 
-    # Create rider 1
-    rider1 = Rider(rcs['rider1'], bike, seatColor='royalblue', riderColor='blueviolet', riderAlpha=-0.5)
+    # Create riders
+    rider1 = Rider(rcs['rider1'], bike, seatColor='royalblue', riderColor='blueviolet', riderAlpha=0.5)
+    rider2 = Rider(rcs['rider2'], bike, seatColor='lime', riderColor='blueviolet', riderAlpha=0.5)
 
 
     fig = plt.figure()
@@ -44,6 +45,7 @@ if __name__ == '__main__':
     bike.drawCrankAndPedals()
 
     rider1.drawSeat()
+    rider2.drawSeat()
 
 
     plt.axis('equal')

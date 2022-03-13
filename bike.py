@@ -37,8 +37,13 @@ class Bike:
 
         self.handleBarPostPosX = None
         self.handleBarPostPosY = None
+        self.handleBarEndPosX = None
+        self.handleBarEndPosY = None
+
         self.handsPosX = None
         self.handsPosY = None
+        self.leverX = None
+        self.leverY = None
 
         self.c1x = None
         self.c1y = None
@@ -59,6 +64,7 @@ class Bike:
         self.calcTopForkLoc()
         self.calcFrontBarLoc()
         self.calcHandleBarLoc()
+        self.calcLeverPos()
 
 
     def drawBikePositions(self):
@@ -75,6 +81,7 @@ class Bike:
         self.drawFrontBar()
         self.drawHeadTube()
         self.drawHandleBar()
+        self.drawLevers()
 
 
     def calcChainStayLine(self):
@@ -219,17 +226,34 @@ class Bike:
         # Calculate distance from front wheel to handle bar post
         frontWheel2HandleBarPost = math.sqrt((self.frontWheelLoc[0] - self.handleBarPostPosX)**2 + (self.frontWheelLoc[1] - self.handleBarPostPosY)**2)
         frontWheel2HandleBarHorzAngle = -math.atan((self.frontWheelLoc[1] - self.handleBarPostPosY)/(self.frontWheelLoc[0] - self.handleBarPostPosX))
-        hands2WheelForkAngle = math.acos((self.bc['hands2FrontWheel']**2 + frontWheel2HandleBarPost**2 - self.bc['handleBarLength']**2) / (2*self.bc['hands2FrontWheel'] * frontWheel2HandleBarPost))
+        hands2WheelForkAngle = math.acos((self.bc['handleBar2FrontWheel']**2 + frontWheel2HandleBarPost**2 - self.bc['handleBarLength']**2) / (2*self.bc['handleBar2FrontWheel'] * frontWheel2HandleBarPost))
         hands2WheelForkHorzAngle = frontWheel2HandleBarHorzAngle + hands2WheelForkAngle
-        self.handsPosX = self.frontWheelLoc[0] + (self.bc['hands2FrontWheel'] * math.cos(math.pi - hands2WheelForkHorzAngle))
-        self.handsPosY = self.frontWheelLoc[1] + (self.bc['hands2FrontWheel'] * math.sin(math.pi - hands2WheelForkHorzAngle))
+        self.handleBarEndPosX = self.frontWheelLoc[0] + (self.bc['handleBar2FrontWheel'] * math.cos(math.pi - hands2WheelForkHorzAngle))
+        self.handleBarEndPosY = self.frontWheelLoc[1] + (self.bc['handleBar2FrontWheel'] * math.sin(math.pi - hands2WheelForkHorzAngle))
 
     def drawHandleBar(self):
         """
         Draw the handle bar.
         """
         plt.plot([self.xfb, self.handleBarPostPosX], [self.yfb, self.handleBarPostPosY], c=self.color)
-        plt.plot([self.handleBarPostPosX, self.handsPosX], [self.handleBarPostPosY, self.handsPosY], c=self.color)
+        plt.plot([self.handleBarPostPosX, self.handleBarEndPosX], [self.handleBarPostPosY, self.handleBarEndPosY], c=self.color)
+
+    def calcLeverPos(self):
+        """
+        Calculate the position of the brake levels, assuming they're 90 deg offset from the handle bar.
+        """
+        handleBarAngle = math.atan((self.handleBarEndPosY - self.handleBarPostPosY) / (self.handleBarEndPosX - self.handleBarPostPosX))
+        leverAngle = handleBarAngle - (math.pi/2.0)
+        self.handsPosX = self.handleBarEndPosX + (self.bc['leverLength']*math.cos(leverAngle)/2.0)
+        self.handsPosY = self.handleBarEndPosY + (self.bc['leverLength']*math.sin(leverAngle)/2.0)
+        self.leverX = self.handleBarEndPosX + (self.bc['leverLength'] * math.cos(leverAngle))
+        self.leverY = self.handleBarEndPosY + (self.bc['leverLength'] * math.sin(leverAngle))
+
+    def drawLevers(self):
+        """
+        Draw the levers.
+        """
+        plt.plot([self.handleBarEndPosX, self.leverX], [self.handleBarEndPosY, self.leverY], c=self.color)
 
     def calcCrankAndPedalLoc(self, theta):
         """
