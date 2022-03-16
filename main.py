@@ -29,13 +29,15 @@ if __name__ == '__main__':
 
 
     # Create figure
-    fig = plt.figure(figsize=(13, 5))
+    fig = plt.figure(figsize=(13*1.5, 5*1.5))
     ax1 = plt.subplot(121)
     ax2 = plt.subplot(222)
     ax3 = plt.subplot(224, sharex=ax2)
     ax3.set_xlabel('Crank Angle (Deg)')
     ax2.set_ylabel('Knee Angle (Deg)')
     ax3.set_ylabel('Hip Angle (Deg)')
+    ax2.grid(axis='y', ls='--')
+    ax3.grid(axis='y', ls='--')
     plt.tight_layout()
     ax1.axis('equal')
     ax1.set_xlim([-950, 1200])
@@ -53,7 +55,9 @@ if __name__ == '__main__':
 
     # Create riders
     rider1 = Rider(rcs['rider1'], bike, seatColor='royalblue', riderColor='blueviolet', riderAlpha=0.5, ax=ax1)
-    rider2 = Rider(rcs['rider2'], bike, seatColor='lime', riderColor='blueviolet', riderAlpha=0.5, ax=ax1)
+    rider2 = Rider(rcs['rider2'], bike, seatColor='lime', riderColor='darkgreen', riderAlpha=0.5, ax=ax1)
+    rider3 = Rider(rcs['rider3'], bike, seatColor='purple', riderColor='red', riderAlpha=0.5, ax=ax1)
+    rider4 = Rider(rcs['rider4'], bike, seatColor='cyan', riderColor='lime', riderAlpha=0.5, ax=ax1)
 
 
 
@@ -63,6 +67,8 @@ if __name__ == '__main__':
     # Draw Seat
     rider1.drawSeat()
     rider2.drawSeat()
+    rider3.drawSeat()
+    rider4.drawSeat()
 
     # Draw pedal and feet
     for crankAngleDeg in np.linspace(-2, 360*40, 360*20):
@@ -73,10 +79,14 @@ if __name__ == '__main__':
         # Draw rider lower body
         rider1.calcAndDrawAll(crankAngleDeg)
         rider2.calcAndDrawAll(crankAngleDeg)
+        rider3.calcAndDrawAll(crankAngleDeg)
+        rider4.calcAndDrawAll(crankAngleDeg)
 
         # Draw angle lines
         rider1.drawAngleLines(ax2, ax3)
         rider2.drawAngleLines(ax2, ax3)
+        rider3.drawAngleLines(ax2, ax3)
+        rider4.drawAngleLines(ax2, ax3)
 
         # Update Axes Limits
         ax2.relim()
@@ -88,4 +98,5 @@ if __name__ == '__main__':
 
     plt.axis('equal')
     plt.show()
+
 

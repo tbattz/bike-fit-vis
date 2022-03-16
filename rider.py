@@ -219,13 +219,13 @@ class Rider:
         :param axHip: The axes to draw the hip on.
         """
         if self.kneeAngleLine is None:
-            self.kneeAngleLine, = axKnee.plot([], [])
+            self.kneeAngleLine, = axKnee.plot([], [], c=self.riderColor)
         if self.hipAngleLine is None:
-            self.hipAngleLine, = axHip.plot([], [])
+            self.hipAngleLine, = axHip.plot([], [], c=self.riderColor)
         if self.currKneeAngleDot is None:
-            self.currKneeAngleDot, = axKnee.plot([], [], marker='o')
+            self.currKneeAngleDot, = axKnee.plot([], [], marker='o', c=self.riderColor)
         if self.currHipAngleDot is None:
-            self.currHipAngleDot, = axHip.plot([], [], marker='o')
+            self.currHipAngleDot, = axHip.plot([], [], marker='o', c=self.riderColor)
 
 
         self.kneeAngleLine.set_data(self.crankAngle, self.kneeAngle)
@@ -239,13 +239,13 @@ class Rider:
         Draw the stationary top half of the rider.
         """
         if self.pedalLine1 is None:
-            self.pedalLine1, = self.ax.plot([], [])
+            self.pedalLine1, = self.ax.plot([], [], c=self.riderColor)
         if self.pedalLine2 is None:
-            self.pedalLine2, = self.ax.plot([], [])
+            self.pedalLine2, = self.ax.plot([], [], c=self.riderColor)
         if self.footLine1 is None:
-            self.footLine1, = self.ax.plot([], [], 'k-')
+            self.footLine1, = self.ax.plot([], [], c=self.riderColor)
         if self.footLine2 is None:
-            self.footLine2, = self.ax.plot([], [], 'k-')
+            self.footLine2, = self.ax.plot([], [], c=self.riderColor)
 
         # Draw foot
         self.footLine1.set_data([self.anklePos1[0], self.endOfFoot1[0]], [self.anklePos1[1], self.endOfFoot1[1]])
@@ -270,7 +270,7 @@ class Rider:
         Draw the riders legs using positions from the 4-bar link.
         """
         if self.legLine1 is None:
-            self.legLine1, = self.ax.plot([], [], 'k-')
+            self.legLine1, = self.ax.plot([], [], c=self.riderColor)
 
 
         self.legLine1.set_data([self.fourBarLegs.O2n[0], self.fourBarLegs.Ann[0], self.fourBarLegs.Bnn[0], self.fourBarLegs.O4n[0]],
@@ -313,7 +313,7 @@ class Rider:
         Draw the riders upper body.
         """
         if self.upperLine1 is None:
-            self.upperLine1, = self.ax.plot([], [], 'k-')
+            self.upperLine1, = self.ax.plot([], [], c=self.riderColor)
 
 
         self.upperLine1.set_data([self.fourBarUpper.O2n[0], self.fourBarUpper.Ann[0], self.fourBarUpper.Bnn[0], self.fourBarUpper.O4n[0]],
