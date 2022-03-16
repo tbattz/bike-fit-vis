@@ -50,6 +50,8 @@ class Bike:
         self.c2x = None
         self.c2y = None
 
+        self.crankLine = None
+
 
 
     def calcBikePositions(self):
@@ -255,24 +257,28 @@ class Bike:
         """
         plt.plot([self.handleBarEndPosX, self.leverX], [self.handleBarEndPosY, self.leverY], c=self.color)
 
-    def calcCrankAndPedalLoc(self, theta):
+    def calcCrankLoc(self, theta):
         """
-        Calculate the crank and pedal locations, given an angle theta.
+        Calculate the crank locations, given an angle theta.
 
         :param theta: The angle, in degrees, of the first crank to the horizontal.
+        :param phi1: The angle of pedal 1 in radians.
+        :param phi2: The angle of pedal 2 in radians.
         """
         thetaRad = math.radians(theta)
+        # Calculate crank location
         self.c1x = (self.bc['crankLength'] * math.cos(thetaRad))
         self.c1y = (self.bc['crankLength'] * math.sin(thetaRad))
         self.c2x = (self.bc['crankLength'] * math.cos(thetaRad + math.pi))
         self.c2y = (self.bc['crankLength'] * math.sin(thetaRad + math.pi))
 
-    def drawCrankAndPedals(self):
+    def drawCrank(self):
         """
-        Draw the crank and pedals.
+        Draw the cranks.
         """
-        plt.plot([self.c1x, self.c2x], [self.c1y, self.c2y], 'b')
-        plt.plot([self.c1x - (self.bc['pedalLength']/2.0), self.c1x + (self.bc['pedalLength']/2.0)], [self.c1y, self.c1y], 'm')
-        plt.plot([self.c2x - (self.bc['pedalLength']/2.0), self.c2x + (self.bc['pedalLength']/2.0)], [self.c2y, self.c2y], 'm')
+        if self.crankLine is None:
+            self.crankLine, = plt.plot([], [], 'b')
+
+        self.crankLine.set_data([self.c1x, self.c2x], [self.c1y, self.c2y])
 
 

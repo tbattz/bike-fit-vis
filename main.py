@@ -36,16 +36,35 @@ if __name__ == '__main__':
     rider1 = Rider(rcs['rider1'], bike, seatColor='royalblue', riderColor='blueviolet', riderAlpha=0.5)
     rider2 = Rider(rcs['rider2'], bike, seatColor='lime', riderColor='blueviolet', riderAlpha=0.5)
 
-
+    # Create figure
     fig = plt.figure()
+    plt.axis('equal')
+    plt.xlim([-1000, 1800])
+    plt.ion()
 
+    # Draw bike
     bike.drawBikePositions()
 
-    bike.calcCrankAndPedalLoc(theta=-30)
-    bike.drawCrankAndPedals()
-
+    # Draw Seat
     rider1.drawSeat()
     rider2.drawSeat()
+
+    # Draw pedal and feet
+    for crankAngleDeg in np.linspace(45, 360*40, 360*20):
+        # Draw cranks
+        bike.calcCrankLoc(theta=-crankAngleDeg)
+        bike.drawCrank()
+
+        # Draw rider feet and pedals
+        rider1.calcAllRiderPos(crankAngleDeg)
+        rider1.drawPedalAndFoot()
+        rider1.drawRiderLegs()
+
+
+
+        plt.pause(0.01)
+
+
 
 
     plt.axis('equal')
