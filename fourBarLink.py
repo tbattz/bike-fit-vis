@@ -5,6 +5,115 @@ import matplotlib.pyplot as plt
 
 class FourBarLink:
     """
+    Adjusts for O2 and O4 not lying on the x axes.
+    """
+    def __init__(self, O2, O4, O2ALen, ABLen, BO4Len, theta2=0.0):
+        self.O2 = np.array(O2)
+        self.O4 = np.array(O4)
+        self.O2ALen = O2ALen
+        self.ABLen = ABLen
+        self.BO4Len = BO4Len
+        self.theta2 = theta2
+
+        self.O2s = None
+        self.O4s = None
+
+        self.O2n = None
+        self.O4n = None
+        self.Ann = None
+        self.Bnn = None
+
+        self.adjustedO2O4Angle = None
+
+        # Rotate points to lie on the x axes
+        self.translateAndRotate2XAxes()
+
+        # Create horizontal 4 bar link
+        self.fourBar = FourBarHorizontalLink(self.O2s.tolist(), self.O4s.tolist(), self.O2ALen, self.ABLen, self.BO4Len, self.theta2 + self.adjustedO2O4Angle)
+        self.fourBar.calcAngles(self.theta2)
+
+        # Counter rotate resultant points
+        self.rotateBack()
+
+
+    def translateAndRotate2XAxes(self):
+        """
+        Rotate points so that O2 and O4 lie on the x axes.
+        """
+        # Shift O2 point to the origin
+        self.O2s = self.O2 - self.O2
+        self.O4s = self.O4 - self.O2
+
+        self.adjustedO2O4Angle = math.pi - math.atan2(self.O2s[1] - self.O4s[1], self.O2s[0] - self.O4s[0])
+        rotMatrix = np.array([[math.cos(self.adjustedO2O4Angle), -math.sin(self.adjustedO2O4Angle)],
+                              [math.sin(self.adjustedO2O4Angle), math.cos(self.adjustedO2O4Angle)]])
+        self.O2s = np.dot(rotMatrix, self.O2s)
+        self.O4s = np.dot(rotMatrix, self.O4s)
+
+    def rotateBack(self):
+        """
+        Rotate the points back after solving the four bar link positions.
+        """
+        rotMatrix = np.array([[math.cos(-self.adjustedO2O4Angle), -math.sin(-self.adjustedO2O4Angle)],
+                              [math.sin(-self.adjustedO2O4Angle), math.cos(-self.adjustedO2O4Angle)]])
+        self.O2n = np.dot(rotMatrix, np.array([[self.fourBar.O2[0]], [self.fourBar.O2[1]]])).flatten() + self.O2
+        self.O4n = np.dot(rotMatrix, np.array([[self.fourBar.O4[0]], [self.fourBar.O4[1]]])).flatten() + self.O2
+        self.Ann = np.dot(rotMatrix, np.array([[self.fourBar.An[0]], [self.fourBar.An[1]]])).flatten() + self.O2
+        self.Bnn = np.dot(rotMatrix, np.array([[self.fourBar.Bn1[0]], [self.fourBar.Bn1[1]]])).flatten() + self.O2
+
+    def setO2O4Pt(self, O2, O4, theta2):
+        """
+        Update the O2 and O4 points.
+
+        :param O2: The [x,y] coordinates for the new point.
+        :param O4: The [x,y] coordinates for the new point.
+        :param theta2: The angle between the r2 line and the r1 line
+        """
+        self.O2 = O2
+        self.O4 = O4
+        self.theta2 = theta2
+
+        # Rotate points to lie on the x axes
+        self.translateAndRotate2XAxes()
+
+        # Update four bar link
+        self.fourBar = FourBarHorizontalLink(self.O2s.tolist(), self.O4s.tolist(), self.O2ALen, self.ABLen, self.BO4Len, self.theta2 + self.adjustedO2O4Angle)
+        self.calcAngles(self.theta2)
+
+        # Counter rotate resultant points
+        self.rotateBack()
+
+
+    def setO4Pt(self, O4, theta2):
+        """
+        Update the O4 point.
+
+        :param O4: The [x,y] coordinates for the new point.
+        :param theta2: The angle between the r2 line and the r1 line
+        """
+        self.O4 = O4
+        self.theta2 = theta2
+
+        # Rotate points to lie on the x axes
+        self.translateAndRotate2XAxes()
+
+        # Update four bar link
+        self.fourBar.setO4Pt(self.O4s.tolist(), self.theta2 + self.adjustedO2O4Angle)
+        self.calcAngles(self.theta2)
+
+        # Counter rotate resultant points
+        self.rotateBack()
+
+
+    def calcAngles(self, theta2):
+        self.theta2 = theta2
+        self.fourBar.calcAngles(self.theta2 + self.adjustedO2O4Angle)
+
+
+
+
+class FourBarHorizontalLink:
+    """
     Assumes O2 and O4 line on the same horizontal line, with O4 to the right of O2.
     """
     def __init__(self, O2, O4, O2ALen, ABLen, BO4Len, theta2=0.0):

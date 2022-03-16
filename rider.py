@@ -154,32 +154,12 @@ class Rider:
         ABLen = self.rc['knee2AnkleLength']
         BO4Len = self.rc['hip2KneeLength']
 
-        # Shift O2 point to the origin
-        self.O2s = O2 - O2
-        self.O4s = O4 - O2
-
-        # Rotate points to lie on the x axes
-        adjustedFootAngle = math.pi - self.footAngleRad1
-        adjustedO2O4Angle = math.pi - math.atan2(self.O2s[1] - self.O4s[1], self.O2s[0] - self.O4s[0])
-        rotMatrix = np.array([[math.cos(adjustedO2O4Angle), -math.sin(adjustedO2O4Angle)],
-                              [math.sin(adjustedO2O4Angle), math.cos(adjustedO2O4Angle)]])
-        self.O2s = np.dot(rotMatrix, self.O2s)
-        self.O4s = np.dot(rotMatrix, self.O4s)
-
         # Create/setup four bar link
+        adjustedFootAngle = math.pi - self.footAngleRad1
         if self.fourBar1 is None:
-            self.fourBar1 = FourBarLink(self.O2s.tolist(), self.O4s.tolist(), O2ALen, ABLen, BO4Len, adjustedFootAngle + adjustedO2O4Angle)
+            self.fourBar1 = FourBarLink(O2, O4, O2ALen, ABLen, BO4Len, adjustedFootAngle)
         else:
-            self.fourBar1.setO4Pt(self.O4s.tolist(), adjustedFootAngle + adjustedO2O4Angle)
-        self.fourBar1.calcAngles(adjustedFootAngle + adjustedO2O4Angle)
-
-        # Counter rotate resultant points
-        rotMatrix = np.array([[math.cos(-adjustedO2O4Angle), -math.sin(-adjustedO2O4Angle)],
-                              [math.sin(-adjustedO2O4Angle), math.cos(-adjustedO2O4Angle)]])
-        self.O2n = np.dot(rotMatrix, np.array([[self.fourBar1.O2[0]], [self.fourBar1.O2[1]]])).flatten() + O2
-        self.O4n = np.dot(rotMatrix, np.array([[self.fourBar1.O4[0]], [self.fourBar1.O4[1]]])).flatten() + O2
-        self.Ann = np.dot(rotMatrix, np.array([[self.fourBar1.An[0]], [self.fourBar1.An[1]]])).flatten() + O2
-        self.Bnn = np.dot(rotMatrix, np.array([[self.fourBar1.Bn1[0]], [self.fourBar1.Bn1[1]]])).flatten() + O2
+            self.fourBar1.setO2O4Pt(O2, O4, adjustedFootAngle)
 
 
 
@@ -221,8 +201,11 @@ class Rider:
         if self.legLine1 is None:
             self.legLine1, = plt.plot([], [], 'k-')
 
-        self.legLine1.set_data([self.O2n[0], self.Ann[0], self.Bnn[0], self.O4n[0]],
-                               [self.O2n[1], self.Ann[1], self.Bnn[1], self.O4n[1]])
+
+        self.legLine1.set_data([self.fourBar1.O2n[0], self.fourBar1.Ann[0], self.fourBar1.Bnn[0], self.fourBar1.O4n[0]],
+                               [self.fourBar1.O2n[1], self.fourBar1.Ann[1], self.fourBar1.Bnn[1], self.fourBar1.O4n[1]])
+
+
 
 
 
