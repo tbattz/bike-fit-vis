@@ -28,19 +28,34 @@ if __name__ == '__main__':
             print()
 
 
+    # Create figure
+    fig = plt.figure(figsize=(13, 5))
+    ax1 = plt.subplot(121)
+    ax2 = plt.subplot(222)
+    ax3 = plt.subplot(224, sharex=ax2)
+    ax3.set_xlabel('Crank Angle (Deg)')
+    ax2.set_ylabel('Knee Angle (Deg)')
+    ax3.set_ylabel('Hip Angle (Deg)')
+    plt.tight_layout()
+    ax1.axis('equal')
+    ax1.set_xlim([-950, 1200])
+    ax1.set_ylim([-400, 1050])
+    ax1.axis('off')
+    plt.ion()
+
+
+
+
+
     # Create bike
-    bike = Bike(bc)
+    bike = Bike(bc, ax=ax1)
     bike.calcBikePositions()
 
     # Create riders
-    rider1 = Rider(rcs['rider1'], bike, seatColor='royalblue', riderColor='blueviolet', riderAlpha=0.5)
-    rider2 = Rider(rcs['rider2'], bike, seatColor='lime', riderColor='blueviolet', riderAlpha=0.5)
+    rider1 = Rider(rcs['rider1'], bike, seatColor='royalblue', riderColor='blueviolet', riderAlpha=0.5, ax=ax1)
+    rider2 = Rider(rcs['rider2'], bike, seatColor='lime', riderColor='blueviolet', riderAlpha=0.5, ax=ax1)
 
-    # Create figure
-    fig = plt.figure()
-    plt.axis('equal')
-    plt.xlim([-1000, 1800])
-    plt.ion()
+
 
     # Draw bike
     bike.drawBikePositions()
@@ -50,26 +65,26 @@ if __name__ == '__main__':
     rider2.drawSeat()
 
     # Draw pedal and feet
-    for crankAngleDeg in np.linspace(45, 360*40, 360*20):
+    for crankAngleDeg in np.linspace(-2, 360*40, 360*20):
         # Draw cranks
         bike.calcCrankLoc(theta=-crankAngleDeg)
         bike.drawCrank()
 
         # Draw rider lower body
-        rider1.calcAllRiderPos(crankAngleDeg)
-        rider1.drawPedalAndFoot()
-        rider1.drawRiderLegs()
+        rider1.calcAndDrawAll(crankAngleDeg)
+        rider2.calcAndDrawAll(crankAngleDeg)
 
-        # Draw rider upper body
-        rider1.calcUpperBody()
-        rider1.drawUpperBody()
+        # Draw angle lines
+        rider1.drawAngleLines(ax2, ax3)
+        rider2.drawAngleLines(ax2, ax3)
 
-
+        # Update Axes Limits
+        ax2.relim()
+        ax2.autoscale_view()
+        ax3.relim()
+        ax3.autoscale_view()
 
         plt.pause(0.01)
-
-
-
 
     plt.axis('equal')
     plt.show()

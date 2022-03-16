@@ -23,8 +23,6 @@ class FourBarLink:
         self.Ann = None
         self.Bnn = None
 
-        self.adjustedO2O4Angle = None
-
         # Rotate points to lie on the x axes
         self.translateAndRotate2XAxes()
 

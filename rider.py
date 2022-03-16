@@ -1,6 +1,5 @@
 import math
 import numpy as np
-import matplotlib.pyplot as plt
 
 from fourBarLink import FourBarLink
 
@@ -10,19 +9,21 @@ class Rider:
     """
     Contains methods for calculating positions of the rider and seat.
     """
-    def __init__(self, rc, bike, seatColor='royalblue', riderColor='blueviolet', riderAlpha=0.5):
+    def __init__(self, rc, bike, seatColor='royalblue', riderColor='blueviolet', riderAlpha=0.5, ax=None):
         """
         :param rc: The rider config dictionary.
         :param bike: An existing bike class containing frame, seat and crank positions.
         :param seatColor: The named color to use for drawing the seat.
         :param riderColor: The named color to use for drawing the rider.
-        :paramAlpha: The alpha transparency value for the rider, from 0 to 1.
+        :param Alpha: The alpha transparency value for the rider, from 0 to 1.
+        :param ax: The axes object to plot on.
         """
         self.rc = rc
         self.bike = bike
         self.seatColor = seatColor
         self.riderColor = riderColor
         self.riderAlpha = riderAlpha
+        self.ax = ax
 
         self.seatExtX = None
         self.seatExtY = None
@@ -70,6 +71,13 @@ class Rider:
         self.legLine2 = None
         self.upperLine1 = None
 
+        self.crankAngle = []
+        self.kneeAngle = []
+        self.hipAngle = []
+
+        self.kneeAngleLine = None
+        self.hipAngleLine = None
+
         self.calcSeatExtensionPos()
 
     def calcSeatExtensionPos(self):
@@ -87,10 +95,10 @@ class Rider:
         Draw the seat and seat post.
         """
         # Plot Seat post
-        plt.plot([self.bike.xst, self.seatPosX], [self.bike.yst, self.seatPosY], c=self.seatColor)
+        self.ax.plot([self.bike.xst, self.seatPosX], [self.bike.yst, self.seatPosY], c=self.seatColor)
 
         # Plot Seat (Assumes flat seat)
-        plt.plot([self.seatPosX - self.rc['seatLengthAft'], self.seatPosX + self.rc['seatLengthFwd']], [self.seatPosY, self.seatPosY], c=self.seatColor)
+        self.ax.plot([self.seatPosX - self.rc['seatLengthAft'], self.seatPosX + self.rc['seatLengthFwd']], [self.seatPosY, self.seatPosY], c=self.seatColor)
 
     def calculatePedalAndFoot(self, crankAngleDeg):
         """
@@ -135,9 +143,31 @@ class Rider:
         endOfFootY = self.anklePos2[1] - (self.rc['footLength'] * math.sin(self.footAngleRad2))
         self.endOfFoot2 = [endOfFootX, endOfFootY]
 
+    def calcKneeAngle(self):
+        """
+        Calculate the knee angle in degrees.
+        """
+        # Find the distance from A to O4
+        AO4Len = math.sqrt((self.fourBarLegs.Ann[0] - self.fourBarLegs.O4n[0])**2 + (self.fourBarLegs.Ann[1] - self.fourBarLegs.O4n[1])**2)
+        # Using the cosine rule
+        kneeAngle = math.degrees(math.acos((AO4Len**2 - self.fourBarLegs.ABLen**2 - self.fourBarLegs.BO4Len**2)/(2*self.fourBarLegs.ABLen*self.fourBarLegs.BO4Len)))
 
+        return kneeAngle
 
-    def calcAllRiderPos(self, crankAngleDeg):
+    def calcHipAngle(self):
+        """
+        Calculate the hip angle in degrees.
+        """
+        # Find the distance from A to O4
+        AO4Len = math.sqrt((self.fourBarLegs.Ann[0] - self.fourBarLegs.O4n[0]) ** 2 + (
+                    self.fourBarLegs.Ann[1] - self.fourBarLegs.O4n[1]) ** 2)
+        # Using the cosine rule
+        oppAngle = math.degrees(math.acos((self.fourBarLegs.ABLen**2 - AO4Len**2 - self.fourBarLegs.BO4Len**2)/(2*AO4Len*self.fourBarLegs.BO4Len)))
+        hipAngle = (90 - oppAngle) + self.rc['hip2HorizontalAngleDeg']
+
+        return hipAngle
+
+    def calcRiderLowerBody(self, crankAngleDeg):
         """
         Calculate all points of the rider.
         """
@@ -162,6 +192,32 @@ class Rider:
         else:
             self.fourBarLegs.setO2O4Pt(O2, O4, adjustedFootAngle)
 
+        # Store values
+        if crankAngleDeg < 360.1 and crankAngleDeg > -1:
+            # Calculate Knee angle
+            kneeAngle = self.calcKneeAngle()
+            hipAngle = self.calcHipAngle()
+
+            # Store values
+            self.crankAngle.append(crankAngleDeg)
+            self.kneeAngle.append(abs(kneeAngle))
+            self.hipAngle.append(abs(hipAngle))
+
+
+    def drawAngleLines(self, axKnee, axHip):
+        """
+        Draw the angle lines for the knee and hip.
+
+        :param axKnee: The axes to draw the knee line on.
+        :param axHip: The axes to draw the hip on.
+        """
+        if self.kneeAngleLine is None:
+            self.kneeAngleLine, = axKnee.plot([], [])
+        if self.hipAngleLine is None:
+            self.hipAngleLine, = axHip.plot([], [])
+
+        self.kneeAngleLine.set_data(self.crankAngle, self.kneeAngle)
+        self.hipAngleLine.set_data(self.crankAngle, self.hipAngle)
 
 
     def drawPedalAndFoot(self):
@@ -169,13 +225,13 @@ class Rider:
         Draw the stationary top half of the rider.
         """
         if self.pedalLine1 is None:
-            self.pedalLine1, = plt.plot([], [])
+            self.pedalLine1, = self.ax.plot([], [])
         if self.pedalLine2 is None:
-            self.pedalLine2, = plt.plot([], [])
+            self.pedalLine2, = self.ax.plot([], [])
         if self.footLine1 is None:
-            self.footLine1, = plt.plot([], [], 'k-')
+            self.footLine1, = self.ax.plot([], [], 'k-')
         if self.footLine2 is None:
-            self.footLine2, = plt.plot([], [], 'k-')
+            self.footLine2, = self.ax.plot([], [], 'k-')
 
         # Draw foot
         self.footLine1.set_data([self.anklePos1[0], self.endOfFoot1[0]], [self.anklePos1[1], self.endOfFoot1[1]])
@@ -200,12 +256,19 @@ class Rider:
         Draw the riders legs using positions from the 4-bar link.
         """
         if self.legLine1 is None:
-            self.legLine1, = plt.plot([], [], 'k-')
+            self.legLine1, = self.ax.plot([], [], 'k-')
 
 
         self.legLine1.set_data([self.fourBarLegs.O2n[0], self.fourBarLegs.Ann[0], self.fourBarLegs.Bnn[0], self.fourBarLegs.O4n[0]],
                                [self.fourBarLegs.O2n[1], self.fourBarLegs.Ann[1], self.fourBarLegs.Bnn[1], self.fourBarLegs.O4n[1]])
 
+
+    def drawRiderLowerBody(self):
+        """
+        Draw the lower body of the rider.
+        """
+        self.drawPedalAndFoot()
+        self.drawRiderLegs()
 
 
     def calcUpperBody(self):
@@ -236,11 +299,26 @@ class Rider:
         Draw the riders upper body.
         """
         if self.upperLine1 is None:
-            self.upperLine1, = plt.plot([], [], 'k-')
+            self.upperLine1, = self.ax.plot([], [], 'k-')
 
 
         self.upperLine1.set_data([self.fourBarUpper.O2n[0], self.fourBarUpper.Ann[0], self.fourBarUpper.Bnn[0], self.fourBarUpper.O4n[0]],
                                 [self.fourBarUpper.O2n[1], self.fourBarUpper.Ann[1], self.fourBarUpper.Bnn[1], self.fourBarUpper.O4n[1]])
 
+
+
+    def calcAndDrawAll(self, crankAngleDeg):
+        """
+        Calculate and draw the entire rider.
+
+        :param crankAngleDeg: The crank angle to draw at.
+        """
+        # Draw rider lower body
+        self.calcRiderLowerBody(crankAngleDeg)
+        self.drawRiderLowerBody()
+
+        # Draw rider upper body
+        self.calcUpperBody()
+        self.drawUpperBody()
 
 

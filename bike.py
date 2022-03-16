@@ -1,17 +1,17 @@
 import math
 import numpy as np
-import matplotlib.pyplot as plt
 
 
 class Bike:
     """
     Contains methods for calculating positions of the bike frame, wheels, crank and pedals.
     """
-    def __init__(self, bc):
+    def __init__(self, bc, ax=None):
         """
         :param bc: The bike configuration dictionary.
         """
         self.bc = bc
+        self.ax = ax
         self.color = 'gray'
 
         self.rearWheelLoc = None
@@ -99,7 +99,7 @@ class Bike:
         """
         Draw the chain stay line.
         """
-        plt.plot([0, self.rearWheelLoc[0]], [0, self.rearWheelLoc[1]], c=self.color)
+        self.ax.plot([0, self.rearWheelLoc[0]], [0, self.rearWheelLoc[1]], c=self.color)
 
     def calcRearWheelLoc(self):
         """
@@ -114,7 +114,7 @@ class Bike:
         Draw the rear wheel circle.
         """
         # Plot Rear Wheel
-        plt.plot(self.xrw, self.yrw, 'r')
+        self.ax.plot(self.xrw, self.yrw, 'r')
 
     def calcFrontWheelLoc(self):
         """
@@ -129,7 +129,7 @@ class Bike:
         Draw the front wheel circle.
         """
         # Plot Front Wheel
-        plt.plot(self.xfw, self.yfw, 'r')
+        self.ax.plot(self.xfw, self.yfw, 'r')
 
     def calcSeatTubeLine(self):
         """
@@ -146,14 +146,14 @@ class Bike:
         """
         Draw the seat tube line.
         """
-        plt.plot([0, self.xst], [0, self.yst], c=self.color)
+        self.ax.plot([0, self.xst], [0, self.yst], c=self.color)
 
     def drawSeatStay(self):
         """
         Draw the seat stay.
         """
         # Plot Seat Stay
-        plt.plot([self.rearWheelLoc[0], self.xst], [self.rearWheelLoc[1], self.yst], c=self.color)
+        self.ax.plot([self.rearWheelLoc[0], self.xst], [self.rearWheelLoc[1], self.yst], c=self.color)
 
     def calcTopForkLoc(self):
         """
@@ -176,14 +176,14 @@ class Bike:
         """
         Draw the down tube.
         """
-        plt.plot([0, self.xfork], [0, self.yfork], c=self.color)
+        self.ax.plot([0, self.xfork], [0, self.yfork], c=self.color)
 
     def drawFrontFork(self):
         """
         Draw the front fork.
         """
         # Plot front fork
-        plt.plot([self.frontWheelLoc[0], self.xfork], [self.frontWheelLoc[1], self.yfork], c=self.color)
+        self.ax.plot([self.frontWheelLoc[0], self.xfork], [self.frontWheelLoc[1], self.yfork], c=self.color)
 
     def calcFrontBarLoc(self):
         """
@@ -207,14 +207,14 @@ class Bike:
         """
         Draw the front bar line.
         """
-        plt.plot([self.xst, self.xfb], [self.yst, self.yfb], c=self.color)
+        self.ax.plot([self.xst, self.xfb], [self.yst, self.yfb], c=self.color)
 
     def drawHeadTube(self):
         """
         Draw the head tube.
         """
         # Plot head tube
-        plt.plot([self.xfb, self.xfork], [self.yfb, self.yfork], c=self.color)
+        self.ax.plot([self.xfb, self.xfork], [self.yfb, self.yfork], c=self.color)
 
     def calcHandleBarLoc(self):
         """
@@ -237,8 +237,8 @@ class Bike:
         """
         Draw the handle bar.
         """
-        plt.plot([self.xfb, self.handleBarPostPosX], [self.yfb, self.handleBarPostPosY], c=self.color)
-        plt.plot([self.handleBarPostPosX, self.handleBarEndPosX], [self.handleBarPostPosY, self.handleBarEndPosY], c=self.color)
+        self.ax.plot([self.xfb, self.handleBarPostPosX], [self.yfb, self.handleBarPostPosY], c=self.color)
+        self.ax.plot([self.handleBarPostPosX, self.handleBarEndPosX], [self.handleBarPostPosY, self.handleBarEndPosY], c=self.color)
 
     def calcLeverPos(self):
         """
@@ -255,7 +255,7 @@ class Bike:
         """
         Draw the levers.
         """
-        plt.plot([self.handleBarEndPosX, self.leverX], [self.handleBarEndPosY, self.leverY], c=self.color)
+        self.ax.plot([self.handleBarEndPosX, self.leverX], [self.handleBarEndPosY, self.leverY], c=self.color)
 
     def calcCrankLoc(self, theta):
         """
@@ -277,7 +277,7 @@ class Bike:
         Draw the cranks.
         """
         if self.crankLine is None:
-            self.crankLine, = plt.plot([], [], 'b')
+            self.crankLine, = self.ax.plot([], [], 'b')
 
         self.crankLine.set_data([self.c1x, self.c2x], [self.c1y, self.c2y])
 
