@@ -78,6 +78,12 @@ class Rider:
         self.kneeAngleLine = None
         self.hipAngleLine = None
 
+        self.currCrankAngle = None
+        self.currKneeAngle = None
+        self.currHipAngle = None
+        self.currKneeAngleDot = None
+        self.currHipAngleDot = None
+
         self.calcSeatExtensionPos()
 
     def calcSeatExtensionPos(self):
@@ -150,7 +156,7 @@ class Rider:
         # Find the distance from A to O4
         AO4Len = math.sqrt((self.fourBarLegs.Ann[0] - self.fourBarLegs.O4n[0])**2 + (self.fourBarLegs.Ann[1] - self.fourBarLegs.O4n[1])**2)
         # Using the cosine rule
-        kneeAngle = math.degrees(math.acos((AO4Len**2 - self.fourBarLegs.ABLen**2 - self.fourBarLegs.BO4Len**2)/(2*self.fourBarLegs.ABLen*self.fourBarLegs.BO4Len)))
+        kneeAngle = math.degrees(math.acos((-AO4Len**2 + self.fourBarLegs.ABLen**2 + self.fourBarLegs.BO4Len**2)/(2*self.fourBarLegs.ABLen*self.fourBarLegs.BO4Len)))
 
         return kneeAngle
 
@@ -162,7 +168,7 @@ class Rider:
         AO4Len = math.sqrt((self.fourBarLegs.Ann[0] - self.fourBarLegs.O4n[0]) ** 2 + (
                     self.fourBarLegs.Ann[1] - self.fourBarLegs.O4n[1]) ** 2)
         # Using the cosine rule
-        oppAngle = math.degrees(math.acos((self.fourBarLegs.ABLen**2 - AO4Len**2 - self.fourBarLegs.BO4Len**2)/(2*AO4Len*self.fourBarLegs.BO4Len)))
+        oppAngle = math.degrees(math.acos((-self.fourBarLegs.ABLen**2 + AO4Len**2 + self.fourBarLegs.BO4Len**2)/(2*AO4Len*self.fourBarLegs.BO4Len)))
         hipAngle = (90 - oppAngle) + self.rc['hip2HorizontalAngleDeg']
 
         return hipAngle
@@ -192,16 +198,17 @@ class Rider:
         else:
             self.fourBarLegs.setO2O4Pt(O2, O4, adjustedFootAngle)
 
+        # Calculate Knee angle
+        self.currCrankAngle = crankAngleDeg % 360
+        self.currKneeAngle = abs(self.calcKneeAngle())
+        self.currHipAngle = abs(self.calcHipAngle())
+
         # Store values
         if crankAngleDeg < 360.1 and crankAngleDeg > -1:
-            # Calculate Knee angle
-            kneeAngle = self.calcKneeAngle()
-            hipAngle = self.calcHipAngle()
-
             # Store values
             self.crankAngle.append(crankAngleDeg)
-            self.kneeAngle.append(abs(kneeAngle))
-            self.hipAngle.append(abs(hipAngle))
+            self.kneeAngle.append(abs(self.currKneeAngle))
+            self.hipAngle.append(abs(self.currHipAngle))
 
 
     def drawAngleLines(self, axKnee, axHip):
@@ -215,9 +222,16 @@ class Rider:
             self.kneeAngleLine, = axKnee.plot([], [])
         if self.hipAngleLine is None:
             self.hipAngleLine, = axHip.plot([], [])
+        if self.currKneeAngleDot is None:
+            self.currKneeAngleDot, = axKnee.plot([], [], marker='o')
+        if self.currHipAngleDot is None:
+            self.currHipAngleDot, = axHip.plot([], [], marker='o')
+
 
         self.kneeAngleLine.set_data(self.crankAngle, self.kneeAngle)
         self.hipAngleLine.set_data(self.crankAngle, self.hipAngle)
+        self.currKneeAngleDot.set_data([self.currCrankAngle], [self.currKneeAngle])
+        self.currHipAngleDot.set_data([self.currCrankAngle], [self.currHipAngle])
 
 
     def drawPedalAndFoot(self):
