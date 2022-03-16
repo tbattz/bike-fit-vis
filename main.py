@@ -55,10 +55,14 @@ if __name__ == '__main__':
         bike.calcCrankLoc(theta=-crankAngleDeg)
         bike.drawCrank()
 
-        # Draw rider feet and pedals
+        # Draw rider lower body
         rider1.calcAllRiderPos(crankAngleDeg)
         rider1.drawPedalAndFoot()
         rider1.drawRiderLegs()
+
+        # Draw rider upper body
+        rider1.calcUpperBody()
+        rider1.drawUpperBody()
 
 
 

@@ -12,7 +12,7 @@
     "shoulder2ElbowLength":290.0,
     "elbow2WristContactLength":230.0,
     "wrist2FingerHoldPoint":135.0,
-    "hip2HorizontalAngleDeg":45.0},
+    "hip2HorizontalAngleDeg":20.0},
 "rider2":{"seatHeight":215.0,
     "seatLengthFwd":125.0,
     "seatLengthAft":150.0,
@@ -27,4 +27,4 @@
     "shoulder2ElbowLength":290.0,
     "elbow2WristContactLength":230.0,
     "wrist2FingerHoldPoint":135.0,
-    "hip2HorizontalAngleDeg":45.0}}
+    "hip2HorizontalAngleDeg":20.0}}

@@ -53,8 +53,8 @@ class Rider:
         self.footAngleRad1 = None
         self.footAngleRad1 = None
 
-        self.fourBar1 = None
-        self.fourBar2 = None
+        self.fourBarLegs = None
+        self.fourBarUpper = None
 
         self.ankle1 = None
         self.knee1 = None
@@ -68,6 +68,7 @@ class Rider:
 
         self.legLine1 = None
         self.legLine2 = None
+        self.upperLine1 = None
 
         self.calcSeatExtensionPos()
 
@@ -146,8 +147,8 @@ class Rider:
         # Setup four bar
         # O2 is the foot-pedal contact point
         # A is the ankle joint
-        # B is the knee join
-        # O4 is the hip join
+        # B is the knee joint
+        # O4 is the hip joint
         O2 = np.array([self.bike.c1x, self.bike.c1y])
         O4 = np.array([self.hipX, self.hipY])
         O2ALen = self.rc['footContactProportion']*self.rc['footLength']
@@ -156,10 +157,10 @@ class Rider:
 
         # Create/setup four bar link
         adjustedFootAngle = math.pi - self.footAngleRad1
-        if self.fourBar1 is None:
-            self.fourBar1 = FourBarLink(O2, O4, O2ALen, ABLen, BO4Len, adjustedFootAngle)
+        if self.fourBarLegs is None:
+            self.fourBarLegs = FourBarLink(O2, O4, O2ALen, ABLen, BO4Len, adjustedFootAngle)
         else:
-            self.fourBar1.setO2O4Pt(O2, O4, adjustedFootAngle)
+            self.fourBarLegs.setO2O4Pt(O2, O4, adjustedFootAngle)
 
 
 
@@ -202,13 +203,44 @@ class Rider:
             self.legLine1, = plt.plot([], [], 'k-')
 
 
-        self.legLine1.set_data([self.fourBar1.O2n[0], self.fourBar1.Ann[0], self.fourBar1.Bnn[0], self.fourBar1.O4n[0]],
-                               [self.fourBar1.O2n[1], self.fourBar1.Ann[1], self.fourBar1.Bnn[1], self.fourBar1.O4n[1]])
+        self.legLine1.set_data([self.fourBarLegs.O2n[0], self.fourBarLegs.Ann[0], self.fourBarLegs.Bnn[0], self.fourBarLegs.O4n[0]],
+                               [self.fourBarLegs.O2n[1], self.fourBarLegs.Ann[1], self.fourBarLegs.Bnn[1], self.fourBarLegs.O4n[1]])
 
 
 
+    def calcUpperBody(self):
+        """
+        Calculate the positions of the rider upper body using a Four Bar Link.
+        """
+        # Setup four bar
+        # O2 is the hip joint
+        # A is the shoulder joint
+        # B is the elbow joint
+        # O4 is the hand joint
+        O2 = np.array([self.hipX, self.hipY])
+        O4 = np.array([self.bike.handsPosX, self.bike.handsPosY])
+        O2ALen = self.rc['hip2ShoulderLength']
+        ABLen = self.rc['shoulder2ElbowLength']
+        BO4Len = self.rc['elbow2WristContactLength']
+
+        # Create/setup four bar link
+        adjustedHipAngle = math.radians(self.rc['hip2HorizontalAngleDeg'])
+        if self.fourBarUpper is None:
+            self.fourBarUpper = FourBarLink(O2, O4, O2ALen, ABLen, BO4Len, adjustedHipAngle)
+        else:
+            self.fourBarUpper.setO2O4Pt(O2, O4, adjustedHipAngle)
 
 
+    def drawUpperBody(self):
+        """
+        Draw the riders upper body.
+        """
+        if self.upperLine1 is None:
+            self.upperLine1, = plt.plot([], [], 'k-')
+
+
+        self.upperLine1.set_data([self.fourBarUpper.O2n[0], self.fourBarUpper.Ann[0], self.fourBarUpper.Bnn[0], self.fourBarUpper.O4n[0]],
+                                [self.fourBarUpper.O2n[1], self.fourBarUpper.Ann[1], self.fourBarUpper.Bnn[1], self.fourBarUpper.O4n[1]])
 
 
 
