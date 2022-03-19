@@ -84,6 +84,8 @@ class Rider:
         self.currKneeAngleDot = None
         self.currHipAngleDot = None
 
+        self.printedMinMaxes = False
+
         self.calcSeatExtensionPos()
 
     def calcSeatExtensionPos(self):
@@ -209,6 +211,9 @@ class Rider:
             self.crankAngle.append(crankAngleDeg)
             self.kneeAngle.append(abs(self.currKneeAngle))
             self.hipAngle.append(abs(self.currHipAngle))
+        elif not self.printedMinMaxes and len(self.crankAngle) > 0:
+            print('%20s. Knee Min: %.2f deg, Knee Max: %.2f deg, Hip Min: %.2f deg, Hip Max: %.2f deg' % (self.riderColor, min(self.kneeAngle), max(self.kneeAngle), min(self.hipAngle), max(self.hipAngle)))
+            self.printedMinMaxes = True
 
 
     def drawAngleLines(self, axKnee, axHip):
